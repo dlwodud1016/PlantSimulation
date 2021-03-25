@@ -1,0 +1,189 @@
+﻿@using System.Text.Json;
+@page "/dashboard"
+
+@implements IDisposable
+
+@using PlantSimulation.BlazorApp.Data
+@using PlantSimulation.BlazorApp.Services
+@using System.Timers
+
+@inject PowerPlantService PlantService
+@inject SimulationService SimulationService
+
+<div>
+    <Row Style="height:300px">
+        <Col Span="18" Push="6" Style="padding-left:20px">
+        <Form Layout="@FormLayout.Vertical"
+              Model="@model"
+              OnFinish="OnFinish"
+              OnFinishFailed="OnFinishFailed">
+
+            <FormItem Label="발전소 명" Style="width:300px">
+                <Input @bind-Value="@context.Name" />
+            </FormItem>
+
+            <FormItem Label="용량">
+                <AntDesign.InputNumber @bind-Value="@context.Capacity" Min="0" Style="width:300px" />
+            </FormItem>
+
+            <FormItem>
+                <Button Type="@ButtonType.Primary" HtmlType="submit">
+                    등록
+                </Button>
+            </FormItem>
+        </Form>
+        </Col>
+        <Col Span="6" Pull="18">
+        <Table DataSource="PlantService.GetPowerPlants()" TItem="PowerPlant" Bordered="true" Size="@TableSize.Small" PageSize="5">
+            <AntDesign.Column TData="string"
+                              @bind-Field="context.Name"
+                              SorterCompare="@((a,b)=> a.Length - b.Length)"
+                              SortDirections="new[] { SortDirection.Descending }"
+                              OnFilter="((value,name)=>name.StartsWith(value))" />
+            <AntDesign.Column TData="double"
+                              DataIndex="@nameof(context.Capacity)"
+                              SorterCompare="@((a,b)=> (int)a - (int)b)" />
+        </Table>
+        </Col>
+
+    </Row>
+    <Divider />
+    <Row>
+        <div style="width:100%">
+            <Line @ref="chart1" Data="data1" Config="monthAvgConfig" />
+        </div>
+    </Row>
+    <Divider />
+    <Row>
+        <div style="width:100%">
+            <Line @ref="chart2" Data="data2" Config="sumConfig" />
+        </div>
+    </Row>
+</div>
+
+
+@code
+{
+    IChartComponent chart1;
+    IEnumerable<SimulationLineChart> data1;
+
+    IChartComponent chart2;
+    IEnumerable<SimulationLineChart> data2;
+
+    protected override async Task OnInitializedAsync()
+    {
+        SimulationService.StartSimulation();
+
+        await base.OnInitializedAsync();
+    }
+
+    LineConfig monthAvgConfig = new LineConfig()
+    {
+        Title = new AntDesign.Charts.Title()
+        {
+            Visible = true,
+            Text = "월 평균 발전량",
+        },
+        Description = new Description()
+        {
+            Visible = true,
+            Text = "발전소 월 평균 발전량 그래프",
+        },
+        Padding = "auto",
+        ForceFit = true,
+        XField = "date",
+        YField = "value",
+        Smooth = true,
+        YAxis = new ValueAxis
+        {
+            Label = new BaseAxisLabel()
+        },
+        Legend = new Legend
+        {
+            Position = "right-top"
+        },
+        SeriesField = "type"
+    };
+
+    LineConfig sumConfig = new LineConfig()
+    {
+        Title = new AntDesign.Charts.Title()
+        {
+            Visible = true,
+            Text = "합계 발전량",
+        },
+        Description = new Description()
+        {
+            Visible = true,
+            Text = "발전소 합계 발전량 그래프",
+        },
+        Padding = "auto",
+        ForceFit = true,
+        XField = "date",
+        YField = "value",
+        Smooth = true,
+        YAxis = new ValueAxis
+        {
+            Label = new BaseAxisLabel()
+        },
+        Legend = new Legend
+        {
+            Position = "right-top"
+        },
+        SeriesField = "type"
+    };
+
+    private void IncrementCount()
+    {
+        Console.WriteLine("IncrementCount");
+        data1 = SimulationService.GetSimulationLineCharts( SimulationService.SimulationType.Avg);
+        data2 = SimulationService.GetSimulationLineCharts( SimulationService.SimulationType.Sum);
+
+        chart1.ChangeData(data1).Wait();
+        chart2.ChangeData(data2).Wait();
+    }
+
+    private Timer timer;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            timer = new Timer();
+            timer.Interval = 3000;
+            timer.Elapsed += OnTimerInterval;
+            timer.AutoReset = true;
+            // Start the timer
+            timer.Enabled = true;
+        }
+        base.OnAfterRender(firstRender);
+    }
+
+    private void OnTimerInterval(object sender, ElapsedEventArgs e)
+    {
+        IncrementCount();
+    }
+
+    public void Dispose()
+    {
+        // During prerender, this component is rendered without calling OnAfterRender and then immediately disposed
+        // this mean timer will be null so we have to check for null or use the Null-conditional operator ?
+        timer?.Dispose();
+    }
+}
+@code
+{
+    private PowerPlant model = new PowerPlant();
+
+    private void OnFinish(EditContext editContext)
+    {
+        PlantService.AddPowerPlant(model);
+
+        Console.WriteLine($"Success:{JsonSerializer.Serialize(model)}");
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        Console.WriteLine($"Failed:{JsonSerializer.Serialize(model)}");
+    }
+}

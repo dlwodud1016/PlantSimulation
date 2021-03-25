@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{C274A7AE-C2A1-4A30-9F6D-BEB1DE547FFD}"
+	ProjectSection(SolutionItems) = preProject
+		doc\디지털트윈 기반의 스마트시티 3차원 태양광 발전 시뮬레이션 시스템 개발.pdf = doc\디지털트윈 기반의 스마트시티 3차원 태양광 발전 시뮬레이션 시스템 개발.pdf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{58ABB53A-BCB8-4ADD-BEA8-DE61DFEC3FF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlantSimulation.BlazorApp", "src\PlantSimulation.BlazorApp\PlantSimulation.BlazorApp.csproj", "{589CB51E-35DA-461F-BCF1-E8CF6512D9FC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{589CB51E-35DA-461F-BCF1-E8CF6512D9FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{589CB51E-35DA-461F-BCF1-E8CF6512D9FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{589CB51E-35DA-461F-BCF1-E8CF6512D9FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{589CB51E-35DA-461F-BCF1-E8CF6512D9FC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{589CB51E-35DA-461F-BCF1-E8CF6512D9FC} = {58ABB53A-BCB8-4ADD-BEA8-DE61DFEC3FF0}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4D5785B1-EB8C-47BB-9366-94517F506DF7}
+	EndGlobalSection
+EndGlobal
